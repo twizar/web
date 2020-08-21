@@ -1,5 +1,6 @@
 import {createMuiTheme} from "@material-ui/core";
 import createPalette from "@material-ui/core/styles/createPalette";
+import createTypography from "@material-ui/core/styles/createTypography";
 
 const red = '#d32f2f',
       lightRed = '#ff5f52',
@@ -11,21 +12,28 @@ const red = '#d32f2f',
 
       white = '#fff'
 
+const palette = createPalette({
+    primary: {
+        main: red,
+        light: lightRed,
+        dark: darkRed,
+        contrastText: white
+    },
+    secondary: {
+        main: blue,
+        light: lightBlue,
+        dark: darkBlue,
+        contrastText: white
+    },
+})
+
 export default createMuiTheme(
     {
-        palette: createPalette({
-            primary: {
-                main: red,
-                light: lightRed,
-                dark: darkRed,
-                contrastText: white
-            },
-            secondary: {
-                main: blue,
-                light: lightBlue,
-                dark: darkBlue,
-                contrastText: white
-            },
+        palette: palette,
+        typography: createTypography(palette,{
+            tab: {
+                fontSize: '1rem'
+            }
         })
     }
 )

@@ -35,7 +35,7 @@ module.exports = {
             {"property": "myFavoriteWrapper"}
         ],
         "linkComponents": [
-            // Components used as alternatives to <a> for linking, eg. <Link to={ url } />
+            // Components used as alternatives to <a> for lskinking, eg. <Link to={ url } />
             "Hyperlink",
             {"name": "Link", "linkAttribute": "to"}
         ]

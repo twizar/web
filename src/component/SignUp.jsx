@@ -1,12 +1,34 @@
 import Button from "@material-ui/core/Button";
-import React from "react";
+import React, {useState} from "react";
 import DialogForm from "./DialogForm";
 import TextField from "@material-ui/core/TextField";
 
 function SignUpForm() {
+    const [errors, setErrors] = useState([])
     return (
         <React.Fragment>
-            <TextField autoFocus margin="dense" id="email" label="E-mail" type="email" fullWidth />
+            <TextField
+                autoFocus
+                margin="dense"
+                id="email"
+                label="E-mail"
+                type="email"
+                fullWidth
+                error={errors.length > 0}
+                helperText={errors.map((err, i) => <span key={i} >{err}</span>)}
+                onBlur={
+                    e => fetch('http://localhost:9779/validate/', {
+                        method: "POST",
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({value: e.target.value})
+                    })
+                        .then(response => response.json())
+                        .then(validation => setErrors(validation.errors))
+                }
+            />
             <TextField margin="dense" id="password" label="Password" type="password" fullWidth />
         </React.Fragment>
     )
