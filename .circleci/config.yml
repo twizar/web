@@ -11,8 +11,8 @@ workflows:
       # - build
       - deploy:
           context: Twizar
-          requires:
-            - build
+          # requires:
+          #  - build
 
 jobs:
   lint:
