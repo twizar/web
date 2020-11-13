@@ -7,8 +7,8 @@ workflows:
   version: 2
   deploy:
     jobs:
-      - lint
-      - build
+      # - lint
+      # - build
       - deploy:
           context: Twizar
           requires:
@@ -34,16 +34,16 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - build
+            - .
   deploy:
     docker:
       - image: amazon/aws-cli:2.1.0
     steps:
       - run: yum install -y tar gzip
       - attach_workspace:
-          at: build
+          at: .
       - aws-s3/sync:
-          from: .
+          from: ./build
           to: "s3://twizar-web-bucket/"
           arguments: |
             --acl public-read \
