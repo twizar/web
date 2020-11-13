@@ -1,4 +1,4 @@
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import SignUp from "../SignUp";
 import SignIn from "../SignIn";
 import React from "react";

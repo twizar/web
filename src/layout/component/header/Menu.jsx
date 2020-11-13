@@ -1,8 +1,9 @@
 import React from "react";
-import useTheme from "@material-ui/core/styles/useTheme";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import useTheme from "@mui/styles/useTheme";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import Tabs from "./Tabs"
 import Drawer from "./Drawer";
+import PropTypes from "prop-types";
 
 export default function Menu(props) {
     const theme = useTheme()
@@ -20,3 +21,10 @@ export default function Menu(props) {
             setChildMenuIndex={props.setChildMenuIndex}
         />
 }
+
+Menu.propTypes = {
+    parentMenuIndex: PropTypes.number,
+    childMenuIndex: PropTypes.number,
+    setParentMenuIndex: PropTypes.func,
+    setChildMenuIndex: PropTypes.func,
+};

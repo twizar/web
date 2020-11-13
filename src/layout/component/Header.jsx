@@ -1,8 +1,8 @@
-import {AppBar, IconButton, Toolbar} from "@material-ui/core";
-import AccountCircle from "@material-ui/icons/AccountCircle";
+import {AppBar, IconButton, Toolbar} from "@mui/material";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 import React from "react";
 import logo from "../../assets/logo.svg"
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles(theme => ({
     toolBarMargin: {
@@ -29,5 +29,4 @@ export default function Header() {
                 </AppBar>
                 <div className={classes.toolBarMargin} />
            </React.Fragment>
-
 }

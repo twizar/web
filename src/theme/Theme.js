@@ -1,6 +1,6 @@
-import {createMuiTheme} from "@material-ui/core";
-import createPalette from "@material-ui/core/styles/createPalette";
-import createTypography from "@material-ui/core/styles/createTypography";
+import {createTheme} from "@mui/material/styles";
+import createPalette from "@mui/material/styles/createPalette";
+import createTypography from "@mui/material/styles/createTypography";
 
 const red = '#d32f2f',
       lightRed = '#ff5f52',
@@ -27,7 +27,7 @@ const palette = createPalette({
     },
 })
 
-export default createMuiTheme(
+export default createTheme(
     {
         palette: palette,
         typography: createTypography(palette,{

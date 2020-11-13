@@ -1,14 +1,15 @@
-import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
-import List from "@material-ui/core/List";
+import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+import List from "@mui/material/List";
 import menu from "../../../config/menu";
-import ListItem from "@material-ui/core/ListItem";
+import ListItem from "@mui/material/ListItem";
 import {Link} from "react-router-dom";
-import ListItemText from "@material-ui/core/ListItemText";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
+import ListItemText from "@mui/material/ListItemText";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
 import React, {useState} from "react";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles} from "@mui/styles";
 import isMobile from "is-mobile";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -85,3 +86,8 @@ export default function Drawer(props) {
         </IconButton>
     </React.Fragment>
 }
+
+Drawer.propTypes = {
+    parentMenuIndex: PropTypes.number,
+    setParentMenuIndex: PropTypes.func,
+};

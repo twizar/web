@@ -1,76 +1,67 @@
-import Grid from "@material-ui/core/Grid";
-import React, {useState} from "react";
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import Checkbox from '@material-ui/core/Checkbox';
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
-import Chip from "@material-ui/core/Chip";
+import Grid from "@mui/material/Grid";
+import React, {useState} from 'react';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import {API} from "aws-amplify";
+import GroupsCount from '../../tourney/GroupsCount';
+import TeamsPerGroup from '../../tourney/TeamsPerGroup';
+import Players from "../../tourney/Players";
+import TourneyTable from "../../tourney/TourneyTable";
+import LeaguesFilter from "../../tourney/LeaguesFilter";
+import {
+    DEFAULT_GROUPS_COUNT, DEFAULT_TEAMS_PER_GROUP_COUNT, EUROPEAN_LEAGUES
+} from "../../../config/config";
 
 export default function MainPage(prop) {
-    const [teamsCount, setTeamsCount] = useState(16)
-    const availableTeamsCounts = [4, 8, 16, 32, 64, 128]
-    const handleChange = event => setTeamsCount(parseInt(event.target.value))
+    const [tourneySettings, setTourneySettings] = useState({
+        groups_count: DEFAULT_GROUPS_COUNT,
+        teams_per_group: DEFAULT_TEAMS_PER_GROUP_COUNT,
+        leagues: EUROPEAN_LEAGUES,
+        users: [
+            {
+                user_id: "Player 1",
+                teams_count: DEFAULT_GROUPS_COUNT * DEFAULT_TEAMS_PER_GROUP_COUNT / 2,
+                required_teams: []
+            },
+            {
+                user_id: "Player 2",
+                teams_count: DEFAULT_GROUPS_COUNT * DEFAULT_TEAMS_PER_GROUP_COUNT / 2,
+                required_teams: []
+            },
+        ]
+    });
+    const [tourney, setTourney] = useState({groups: []});
+    const [openDialogTable, setOpenDialogTable] = useState(false)
 
-    const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-    const checkedIcon = <CheckBoxIcon fontSize="small" color={"primary"}/>;
+    prop.users.emailById = function (id) {
+        const user = this.filter(user => user.Username === id)[0]
+        return user.Attributes.filter(attribute => attribute.Name === "email")[0].Value
+    };
     return (
-        <Grid container spacing={2} >
+        <Grid container spacing={6} >
             <Grid item >
-                <FormControl component="fieldset">
-                    <FormLabel >Teams count</FormLabel>
-                    <RadioGroup name="teams-count" row value={teamsCount} onChange={handleChange} >
-                        {availableTeamsCounts.map((count, i) =>
-                            <FormControlLabel key={i} value={count} control={<Radio color="primary" />} label={count} />
-                        )}
-                    </RadioGroup>
-                </FormControl>
+                <GroupsCount tourneySettings={tourneySettings} setTourneySettings={setTourneySettings} />
             </Grid>
-            <Grid item container spacing={4} >
-                {prop.players.map((player, i) =>
-                    <Grid key={i} item >
-                        <TextField
-                            required
-                            label="Player name"
-                            defaultValue={player.name}
-                            variant="outlined"
-                        />
-                        <TextField type="number" label="Teams count" inputProps={{min: 1, max: 4}} defaultValue={player.teamsCount} variant="outlined" />
-                        <Autocomplete
-                            multiple
-                            options={prop.teams}
-                            disableCloseOnSelect
-                            getOptionLabel={(option) => option.name}
-                            renderOption={(option, { selected }) => (
-                                <React.Fragment>
-                                    <Checkbox
-                                        icon={icon}
-                                        checkedIcon={checkedIcon}
-                                        checked={selected}
-                                    />
-                                    {option.name}
-                                </React.Fragment>
-                            )}
-                            renderTags={(tagValue, getTagProps) =>
-                                tagValue.map((team, index) => (
-                                    <Chip
-                                        label={team.name}
-                                        {...getTagProps({ index })}
-                                        style={{backgroundColor: team.color}}
-                                        color={"primary"}
-                                    />
-                                ))}
-                            renderInput={(params) => (
-                                <TextField {...params} variant="outlined" label="Required teams" />
-                            )}
-                        />
-                    </Grid>
-                )}
+            <Grid item >
+                <TeamsPerGroup tourneySettings={tourneySettings} setTourneySettings={setTourneySettings} />
+            </Grid>
+            <Grid item >
+                <LeaguesFilter tourneySettings={tourneySettings} setTourneySettings={setTourneySettings} />
+            </Grid>
+            <Grid item container spacing={2} >
+                <Players tourneySettings={tourneySettings} setTourneySettings={setTourneySettings} teams={prop.teams} />
+            </Grid>
+            <Grid item >
+                <TourneyTable open={openDialogTable} setOpenDialogTable={setOpenDialogTable} tourney={tourney} />
+                <Stack spacing={2} direction="row" >
+                    <Button variant="contained" onClick={() => {
+                        API.post("Teams", "/tourneys", { body: tourneySettings }).then(response => {
+                            const tourney = response[0];
+                            setTourney(tourney);
+                            setOpenDialogTable(true);
+                        })
+                    }} >Generate tourney</Button>
+                </Stack>
             </Grid>
         </Grid>
     );

@@ -1,0 +1,20 @@
+CIRCLECI_CLI_IMAGE=circleci/circleci-cli:latest
+NODEJS_IMAGE=node:16.2.0-alpine3.13
+
+run:
+	docker run --rm -v ${PWD}:/app -w /app -p ${PORT}:3000 --env PORT=3000 -it $(NODEJS_IMAGE) yarn start
+
+lint:
+	docker run --rm -v ${PWD}:/app -w /app $(NODEJS_IMAGE) yarn lint
+
+build:
+	docker run --rm -v ${PWD}:/app -w /app $(NODEJS_IMAGE) yarn build
+
+test:
+	docker run --rm -v ${PWD}:/app -w /app $(NODEJS_IMAGE) yarn test
+
+add:
+	docker run --rm -v ${PWD}:/app -w /app $(NODEJS_IMAGE) yarn add ${PACKAGES} --dev
+
+ci-local:
+	circleci local execute --job deploy

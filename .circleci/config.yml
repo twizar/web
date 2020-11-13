@@ -8,11 +8,13 @@ workflows:
   deploy:
     jobs:
       # - lint
-      - build
-      - deploy:
+      # - build
+      - prepare_source_to_build:
           context: Twizar
-          requires:
-            - build
+      #- deploy:
+      #    context: Twizar
+      #    requires:
+      #      - build
 
 jobs:
   lint:
@@ -23,12 +25,33 @@ jobs:
       - checkout
       - run: yarn install
       - run: yarn lint
+  prepare_source_to_build:
+    docker:
+      - image: amazon/aws-cli:2.1.0
+    steps:
+      - run: yum install -y tar gzip
+      - checkout
+      - run: cp src/aws-exports.js.example src/aws-exports.js
+      - run: |
+          export IDENTITY_POOL_ID=$(aws cognito-identity list-identity-pools --max-results 20 --query 'IdentityPools[?IdentityPoolName == `twizar`].IdentityPoolId' --output text)
+          export USER_POOL_ID=$(aws cognito-idp list-user-pools --max-results 20 --query 'UserPools[?Name == `twizar`].Id' --output text)
+          export USER_POOL_WEB_CLIENT_ID=$(aws cognito-idp list-user-pool-clients --user-pool-id ${USER_POOL_ID} --query 'UserPoolClients[?UserPoolId == `${USER_POOL_ID}`].ClientId' --output text)
+          aws cognito-idp list-user-pool-clients --user-pool-id ${USER_POOL_ID} --query 'UserPoolClients[?UserPoolId == `${USER_POOL_ID}`].ClientId' --output text
+          echo ${USER_POOL_WEB_CLIENT_ID}
+          sed -i "s|{IDENTITY_POOL_ID}|${IDENTITY_POOL_ID}|g" src/aws-exports.js
+          sed -i "s|{USER_POOL_ID}|${USER_POOL_ID}|g" src/aws-exports.js
+      - run: cat src/aws-exports.js
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
   build:
     docker:
       - image: node:14.5.0-alpine3.12
     steps:
-      - run: apk add git
-      - checkout
+      # - run: apk add git
+      # - checkout
+      # - run: cp src/aws-exports.js.example src/aws-exports.js
       - run: yarn install
       - run: yarn build
       - persist_to_workspace:
@@ -44,7 +67,7 @@ jobs:
           at: .
       - aws-s3/sync:
           from: ./build
-          to: "s3://twizar-web-bucket/"
+          to: "s3://twizar/"
           arguments: |
             --acl public-read \
             --cache-control "max-age=86400"

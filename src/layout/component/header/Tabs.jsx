@@ -1,12 +1,12 @@
 import menu from "../../../config/menu";
-import Tab from "@material-ui/core/Tab";
+import Tab from "@mui/material/Tab";
 import {Link} from "react-router-dom";
-import MUIMenu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
+import MUIMenu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import React, { useState } from "react";
-import {makeStyles} from "@material-ui/core/styles";
-import useTheme from "@material-ui/core/styles/useTheme";
-import MUITabs from "@material-ui/core/Tabs";
+import {makeStyles, useTheme} from "@mui/styles";
+import MUITabs from "@mui/material/Tabs";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles(theme => ({
     tabContainer: {
@@ -38,7 +38,10 @@ export default function Tabs(props) {
     const theme = useTheme()
     const [childMenuAnchor, setChildMenuAnchor] = useState(null)
     const [expandMenu, setExpandMenu] = useState(false)
-    const handleChangeParentMenuItem = (e, newValue) => props.setParentMenuIndex(newValue)
+    const handleChangeParentMenuItem = (e, newValue) => {
+        props.setParentMenuIndex(newValue)
+        props.setChildMenuIndex(null)
+    }
     const handleMouseOverOnMenuItem = (e) => {
         setChildMenuAnchor(e.currentTarget);
         setExpandMenu(true)
@@ -98,3 +101,10 @@ export default function Tabs(props) {
         </MUIMenu> : null)}
     </React.Fragment>
 }
+
+Tabs.propTypes = {
+    parentMenuIndex: PropTypes.number,
+    childMenuIndex: PropTypes.number,
+    setParentMenuIndex: PropTypes.func,
+    setChildMenuIndex: PropTypes.func,
+};

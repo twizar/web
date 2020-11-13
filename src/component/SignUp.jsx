@@ -1,41 +1,32 @@
-import Button from "@material-ui/core/Button";
-import React, {useState} from "react";
+import Button from "@mui/material/Button";
+import React from "react";
 import DialogForm from "./DialogForm";
-import TextField from "@material-ui/core/TextField";
+import TextField from "@mui/material/TextField";
+import Snackbar from "./Snackbar";
+import {Auth} from "aws-amplify";
+import PropTypes from "prop-types";
 
-function SignUpForm() {
-    const [errors, setErrors] = useState([])
+function SignUpForm(props) {
     return (
         <React.Fragment>
-            <TextField
-                autoFocus
-                margin="dense"
-                id="email"
-                label="E-mail"
-                type="email"
-                fullWidth
-                error={errors.length > 0}
-                helperText={errors.map((err, i) => <span key={i} >{err}</span>)}
-                onBlur={
-                    e => fetch('http://localhost:9779/validate/', {
-                        method: "POST",
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({value: e.target.value})
-                    })
-                        .then(response => response.json())
-                        .then(validation => setErrors(validation.errors))
-                }
-            />
-            <TextField margin="dense" id="password" label="Password" type="password" fullWidth />
+            <TextField autoFocus margin="dense" id="email" label="E-mail" type="email" fullWidth onChange={event => props.setEmail(event.target.value)} />
+            <TextField margin="dense" id="password" label="Password" type="password" fullWidth onChange={event => props.setPassword(event.target.value)} />
         </React.Fragment>
     )
 }
 
 export default function SignUp() {
     const [open, setOpen] = React.useState(false);
+
+    const [email, setEmail] = React.useState(null);
+    const [password, setPassword] = React.useState(null);
+
+    const [snackbar, setSnackbar] = React.useState({
+        open: false,
+        text: null,
+        severity: null
+    });
+
     return (
         <React.Fragment>
             <Button
@@ -50,10 +41,35 @@ export default function SignUp() {
             <DialogForm
                 open={open}
                 title="Sign up"
-                formComponent={<SignUpForm />}
+                formComponent={<SignUpForm setEmail={setEmail} setPassword={setPassword} />}
                 handleClose={function () {setOpen(false)}}
                 submitButtonText={"Sign up"}
+                handleSubmit={
+                    async function () {
+                        try {
+                            const { user } = await Auth.signUp({
+                                username: email,
+                                password: password,
+                            });
+                            console.log(user);
+                        } catch (error) {
+
+                            console.log(error);
+                            setSnackbar({
+                                open: true,
+                                text: error.message,
+                                severity: "error"
+                            })
+                        }
+                    }
+                }
             />
+            <Snackbar open={snackbar.open} severity={snackbar.severity} text={snackbar.text} setSnackbar={setSnackbar} />
         </React.Fragment>
     )
 }
+
+SignUpForm.propTypes = {
+    setEmail: PropTypes.func,
+    setPassword: PropTypes.func
+};

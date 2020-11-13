@@ -1,47 +1,51 @@
 import React, {useState, useEffect} from 'react';
-import { ThemeProvider } from "@material-ui/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import  MainLayout  from "./layout/MainLayout.jsx"
+import UsersRepository  from "./repository/UsersRepository.js"
 import theme from "./theme/Theme";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import AnonymousPage from './component/page/AnonymousPage.jsx';
-import {PATH_ABOUT, PATH_FEEDBACK, PATH_STATS, PATH_PLAYERS_STATS, PATH_TOURNEY_STATS} from "./config/config";
+import {
+    PATH_ABOUT,
+    PATH_FEEDBACK,
+    PATH_STATS,
+    PATH_PLAYERS_STATS,
+    PATH_TOURNEY_STATS,
+} from "./config/config";
+import {Auth, API} from "aws-amplify";
+import MainPage from "./component/page/MainPage/MainPage";
 
 function App() {
+    const [teams, setTeams] = useState([])
+    const [users, setUsers] = useState([])
+    const [userCognito, setUserCognito] = useState(null)
 
-  const [, setTeams] = useState([])
-  const [, setPlayers] = useState([])
+    useEffect(() => {
 
-  useEffect(() => {
-      setTeams([
-          {
-              name: "Liverpool",
-              color: "red"
-          }
-      ])
-      setPlayers([
-          {
-              name: "User1"
-          }
-      ])
-      /*fetch('http://localhost:9779/teams/')
-          .then(response => response.json())
-          .then(uploadedTeams => setTeams(uploadedTeams))
-      fetch('http://localhost:9779/players/')
-          .then(response => response.json())
-          .then(uploadPlayers => setPlayers(uploadPlayers))*/
+        UsersRepository.GetUsers().then(users => {
+            setUsers(users)
+        })
+
+        Auth.currentAuthenticatedUser().then(user => {
+            setUserCognito(user);
+        })
+
+        API.get("Teams", "/teams", null).then(teams => setTeams(teams))
   }, [])
 
   return (
       <ThemeProvider theme={theme} >
           <BrowserRouter>
-              {/*<MainLayout content={<MainPage teams={teams} players={players} />} />*/}
-              <MainLayout content={<AnonymousPage />} />
+              <MainLayout
+                  user={userCognito}
+                  content={userCognito ? <MainPage users={users} teams={teams} /> : <AnonymousPage />}
+              />
               <Switch>
-                    <Route exact path={PATH_ABOUT} component={() => <div>About</div>} />
-                    <Route exact path={PATH_FEEDBACK} component={() => <div>Feedback</div>} />
-                    <Route exact path={PATH_STATS} component={() => <div>Stats</div>} />
-                    <Route exact path={PATH_PLAYERS_STATS} component={() => <div>PLayer stats</div>} />
-                    <Route exact path={PATH_TOURNEY_STATS} component={() => <div>Tourney stats</div>} />
+                    <Route exact path={PATH_ABOUT} />
+                    <Route exact path={PATH_FEEDBACK} />
+                    <Route exact path={PATH_STATS} />
+                    <Route exact path={PATH_PLAYERS_STATS} />
+                    <Route exact path={PATH_TOURNEY_STATS} />
               </Switch>
           </BrowserRouter>
       </ThemeProvider>
