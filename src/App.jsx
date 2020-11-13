@@ -4,13 +4,12 @@ import  MainLayout  from "./layout/MainLayout.jsx"
 import theme from "./theme/Theme";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import AnonymousPage from './component/page/AnonymousPage.jsx';
-import MainPage from './component/page/MainPage/MainPage.jsx';
 import {PATH_ABOUT, PATH_FEEDBACK, PATH_STATS, PATH_PLAYERS_STATS, PATH_TOURNEY_STATS} from "./config/config";
 
 function App() {
 
-  const [teams, setTeams] = useState([])
-  const [players, setPlayers] = useState([])
+  const [, setTeams] = useState([])
+  const [, setPlayers] = useState([])
 
   useEffect(() => {
       fetch('http://localhost:9779/teams/')

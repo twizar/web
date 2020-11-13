@@ -1,16 +1,46 @@
-version: 2
+version: 2.1
+
+orbs:
+  aws-s3: circleci/aws-s3@2.0.0
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - lint
+      - build
+      - deploy
+
 jobs:
   lint:
     docker:
       - image: node:14.5.0-alpine3.12
     steps:
-      - run:
-          name: add git
-          command: apk add git
+      - run: apk add git
       - checkout
-      - run:
-          name: install
-          command: yarn install
-      - run:
-          name: lint
-          command: yarn lint
+      - run: yarn install
+      - run: yarn lint
+  build:
+    docker:
+      - image: node:14.5.0-alpine3.12
+    steps:
+      - run: apk add git
+      - checkout
+      - run: yarn install
+      - run: yarn build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build
+  deploy:
+    docker:
+      - image: amazon/aws-cli:2.1.0
+    steps:
+      - attach_workspace:
+          at: build
+      - aws-s3/sync:
+          from: .
+          to: "s3://twizar-web-bucket/"
+          arguments: |
+            --acl public-read \
+            --cache-control "max-age=86400"
