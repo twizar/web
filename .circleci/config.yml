@@ -9,7 +9,9 @@ workflows:
     jobs:
       - lint
       - build
-      - deploy
+      - deploy:
+          requires:
+            - build
 
 jobs:
   lint:
@@ -36,6 +38,7 @@ jobs:
     docker:
       - image: amazon/aws-cli:2.1.0
     steps:
+      - run: apt install -y tar
       - attach_workspace:
           at: build
       - aws-s3/sync:
