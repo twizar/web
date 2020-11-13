@@ -12,12 +12,23 @@ function App() {
   const [, setPlayers] = useState([])
 
   useEffect(() => {
-      fetch('http://localhost:9779/teams/')
+      setTeams([
+          {
+              name: "Liverpool",
+              color: "red"
+          }
+      ])
+      setPlayers([
+          {
+              name: "User1"
+          }
+      ])
+      /*fetch('http://localhost:9779/teams/')
           .then(response => response.json())
           .then(uploadedTeams => setTeams(uploadedTeams))
       fetch('http://localhost:9779/players/')
           .then(response => response.json())
-          .then(uploadPlayers => setPlayers(uploadPlayers))
+          .then(uploadPlayers => setPlayers(uploadPlayers))*/
   }, [])
 
   return (
