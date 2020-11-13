@@ -38,7 +38,7 @@ jobs:
     docker:
       - image: amazon/aws-cli:2.1.0
     steps:
-      - run: yum install -y tar
+      - run: yum install -y tar gzip
       - attach_workspace:
           at: build
       - aws-s3/sync:
