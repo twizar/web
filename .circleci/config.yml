@@ -8,11 +8,11 @@ workflows:
   deploy:
     jobs:
       # - lint
-      # - build
+      - build
       - deploy:
           context: Twizar
-          # requires:
-          #  - build
+            requires:
+              - build
 
 jobs:
   lint:
